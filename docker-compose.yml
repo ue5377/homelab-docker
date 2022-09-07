@@ -93,19 +93,6 @@ services:
           memory: 128M
     restart: always
 
-  dozzle:
-    container_name: dozzle
-    image: amir20/dozzle:latest
-
-    networks:
-      - socky_proxy-net
-
-    ports:
-      - ${PORT_DOZZLE}:8080
-
-    environment:
-      DOCKER_HOST: tcp://socky_proxy:${PORT_SOCKY_PROXY} # redirects socket to the proxy
-
   heimdall:
     container_name: heimdall
     image: ghcr.io/linuxserver/heimdall
@@ -146,6 +133,53 @@ services:
         limits:
           cpus: '1'
           memory: 128M
+    restart: always
+
+####################
+# System Information
+####################
+
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:latest
+
+    networks:
+      - socky_proxy-net
+
+    ports:
+      - ${PORT_DOZZLE}:8080
+
+    environment:
+      DOCKER_HOST: tcp://socky_proxy:${PORT_SOCKY_PROXY} # redirects socket to the proxy
+    
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 64M
+    restart: always
+
+  lazydocker:
+    container_name: lazydocker
+    image: lazyteam/lazydocker
+
+    networks:
+      - socky_proxy-net
+    
+    environment:
+      DOCKER_HOST: tcp://socky_proxy:${PORT_SOCKY_PROXY} # redirects socket to the proxy
+
+    stdin_open: true
+    tty: true
+
+    volumes:
+      - ${CONFIGDIR}/lazydocker:/.config/jesseduffield/lazydocker
+
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 64M
     restart: always
 
 ####################
